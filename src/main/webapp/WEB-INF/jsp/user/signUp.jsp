@@ -3,7 +3,7 @@
 <div class="d-flex justify-content-center">
 	<div class="sign-up-box">
 		<h1 class="m-4 font-weight-bold">회원가입</h1>
-		<form id="signUpForm" method="post" action="/user/sign_up">
+		<form id="signUpForm" method="post" action="/user/sign-up">
 			<span class="sign-up-subject">ID</span>
 			<%-- 인풋 옆에 중복확인 버튼을 옆에 붙이기 위해 div 만들고 d-flex --%>
 			<div class="d-flex ml-3 mt-3">
@@ -53,33 +53,33 @@ $(document).ready(function(){
 		//alert("중복확인");
 		
 		// 경고 문구 초기화
-		$("#idCheckLength").addClass('d-none');
-		$("#idCheckDuplicated").addClass('d-none');
-		$("#idCheckOk").addClass('d-none');
+		$('#idCheckLength').addClass('d-none');
+		$('#idCheckDuplicated').addClass('d-none');
+		$('#idCheckOk').addClass('d-none');
 		
-		let loginId = $("#loginId").val().trim();
-		if (loginId.length < 4){
-			$("#idCheckLength").removeClass('d-none');
+		let loginId = $('#loginId').val().trim();
+		if (loginId.length < 4) {
+			$('#idCheckLength').removeClass('d-none');
 			return;
 		}
 		
 		// AJAX - 중복 확인
 		$.ajax({
 			// request
-			type:"GET"
-			, url:"/user/is-duplicated-id"
-			, data:{"loginId":loginId}
+			url:"/user/is-duplicated-id"
+			, data: {"loginId":loginId}
 			
 			// response
-			, success:function(data){
-				// {"code":200, "isDuplicated":true}  중복 true
-				if (data.isDuplicated){ // 중복
-					$("#idCheckDuplicated").removeClass('d-none');
-				} else { // 중복 아님 => 사용 가능
-					$("#idCheckOk").removeClass('d-none');
+			, success: function(data) {
+				if (data.isDuplicatedId) {
+					// 중복
+					$('#idCheckDuplicated').removeClass('d-none');
+				} else {
+					// 중복 아님 => 사용 가능
+					$('#idCheckOk').removeClass('d-none');
 				}
 			}
-			, error:function(request, status, error){
+			, error: function(request, status, error) {
 				alert("중복 확인에 실패했습니다.");
 			}
 		});
@@ -91,15 +91,61 @@ $(document).ready(function(){
 		
 		//alert("회원가입");
 		// validation
-		let loginId = $("#loginId").val().trim();
-		let password = $(".password").val();
-		let name = $(".name").val().trim();
-		let email = $(".email").val().trim();
+		let loginId = $("input[name=loginId]").val().trim();
+		let password = $("input[name=password]").val();
+		let confirmPassword = $("input[name=confirmPassword]").val();
+		let name = $("input[name=name]").val().trim();
+		let email = $("input[name=email]").val().trim();
 		
 		if (!loginId){
 			alert("아이디를 입력하세요.");
 			return false;
 		}
+		
+		if (!password || !confirmPassword){
+			alert("비밀번호를 입력하세요.");
+			return false;
+		}
+		
+		if (password != confirmPassword){
+			alert("비밀번호가 일치하지 않습니다.");
+			return false;
+		}
+		
+		if (!name){
+			alert("이름을 입력하세요.");
+			return false;
+		}
+		
+		if (!email){
+			alert("이메일을 입력하세요.");
+			return false;
+		}
+		
+		// 아이디 중복 확인 완료됐는지 확인 => idCheckOk d-none이 있으면 얼럿을 띄워야함
+		if ($("#idCheckOk").hasClass('d-none')){
+			alert("아이디 중복 확인을 다시 해주세요.");
+			return false;
+		}
+		
+		
+		// 서버로 보내기 
+		let url = $(this).attr('action');
+		//alert(url);
+		let params = $(this).serialize();
+		console.log(params);
+		
+		$.post(url, params) // request
+		.done(function(data){ // response
+			// {"code":200, "result":"성공"}
+			if (data.code == 200){
+				alert("가입을 환영합니다. 로그인을 해 주세요.");
+				location.href = "/user/sign-in-view";
+			} else {
+				alert(data.errorMessage);
+			}
+			
+		});
 	});
 });
 </script>
