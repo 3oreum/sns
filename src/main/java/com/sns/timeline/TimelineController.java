@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class TimelineController {
 
+	// 타임라인 
 	@GetMapping("/list-view")
 	public String timelineListView(Model model, HttpSession session) {
 		// 로그인 여부 확인
