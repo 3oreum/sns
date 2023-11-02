@@ -9,5 +9,19 @@
  		FROM
  			`post`
  	</select>
+ 	
+ 	<select id="selectPostListByUserId" parameterType="int" resultType="com.sns.post.domain.Post">
+ 		SELECT
+ 			`id`
+			,`userId`
+			,`content`
+			,`imagePath`
+			,`createdAt`
+			,`updatedAt`
+		FROM
+			`post`
+		WHERE
+			`userId` = #{userId}
+ 	</select>
  
  </mapper>
